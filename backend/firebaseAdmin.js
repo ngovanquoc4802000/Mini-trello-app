@@ -1,10 +1,5 @@
-// firebaseAdmin.js
 import "dotenv/config";
 import admin from "firebase-admin";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-
 const serviceAccountPath = process.env.SERVICE_ACCOUNT_KEY_PATH;
 
 if (!serviceAccountPath) {
