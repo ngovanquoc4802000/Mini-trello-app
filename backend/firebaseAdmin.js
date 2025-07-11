@@ -15,7 +15,7 @@ if (!serviceAccountPath) {
 let serviceAccount;
 
 try {
-  serviceAccount = require(serviceAccountPath); 
+  serviceAccount = serviceAccountPath 
   console.log("Success: Đã đọc được tệp Service Account Path");
 } catch (error) {
   console.error(`Lỗi: Không thể đọc tệp tài khoản dịch vụ tại đường dẫn: ${serviceAccountPath}`);

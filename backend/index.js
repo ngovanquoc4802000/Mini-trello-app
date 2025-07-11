@@ -1,14 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import morgan from "morgan";
-import "colors";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { firebaseStoreDB,auth, storage,realtimeDB,adminSdk} from "./firebaseAdmin.js";
 import routerBoard from "./routers/routerBoard.js"
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(cookieParser());
 app.use(express.json());
