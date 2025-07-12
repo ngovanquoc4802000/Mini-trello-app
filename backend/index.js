@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { firebaseStoreDB,auth, storage,realtimeDB,adminSdk} from "./firebaseAdmin.js";
 import routerBoard from "./routers/routerBoard.js"
-import routerCart from "./routers/routerCart.js";
+import routerCards from "./routers/routerCards.js";
 import routerInvite from "./routers/routerInvite.js";
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(morgan("dev"));
 
 app.use(cors());
 app.use("/boards",routerBoard)
-app.use("/boards/:boardsId/carts", routerCart);
+app.use("/boards/:boardsId/cards", routerCards);
 app.use("/boards/", routerInvite)
 
 app.get("/", (req, res) => {
