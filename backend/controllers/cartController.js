@@ -124,6 +124,40 @@ const updateCart = async (req, res) => {
   }
 };
 
+const getCartsByUser = async (req, res) => {
+  try {
+    const { userId, boardsId } = req.params;
+    const cartsSnapshot = await firebaseStoreDB
+      .collection("carts")
+      .where("userId", "==", userId)
+      .where("boardsId", "==", boardsId)
+      .get();
+    if (cartsSnapshot.empty) {
+      return res.status(404).json({ message: "No carts found for this user." });
+    }
+    const carts = cartsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      boardsId: doc.data().boardsId,
+      userId: doc.data().userId,
+      name: doc.data().name,
+      description: doc.data().description,
+      tasks_count: doc.data().tasks_count || 0,
+      list_member: doc.data().list_member || [],
+      createdAt:
+        doc.data().createdAt || adminSdk.firestore.FieldValue.serverTimestamp(),
+      ...doc.data(),
+    }));
+    res.status(200).json({
+      message: "Carts retrieved successfully",
+      description: "Retrieves cards associated with a specific user.",
+      carts: carts,
+    });
+  } catch (error) {
+    console.error("Error fetching carts:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const deleteCart = async (req, res) => {
   try {
     const { boardsId, id } = req.params;
@@ -147,7 +181,7 @@ const deleteCart = async (req, res) => {
   } catch (error) {
     console.error("Error deleting cart:", error);
     res.status(500).json({ error: "Internal server error" });
-  } 
+  }
 };
 
 export default {
@@ -155,5 +189,6 @@ export default {
   getCartsAll,
   getCartById,
   updateCart,
-  deleteCart
+  deleteCart,
+  getCartsByUser,
 };

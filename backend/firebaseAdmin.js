@@ -3,18 +3,22 @@ import admin from "firebase-admin";
 const serviceAccountPath = process.env.SERVICE_ACCOUNT_KEY_PATH;
 
 if (!serviceAccountPath) {
-  console.error("Lỗi: SERVICE_ACCOUNT_KEY_PATH chưa được đặt trong tệp .env");
+  console.error("Error: SERVICE_ACCOUNT_KEY_PATH is not set in .env file");
   process.exit(1);
 }
 
 let serviceAccount;
 
 try {
-  serviceAccount = serviceAccountPath 
-  console.log("Success: Đã đọc được tệp Service Account Path");
+  serviceAccount = serviceAccountPath;
+  console.log("Success: Read File Service Account Path");
 } catch (error) {
-  console.error(`Lỗi: Không thể đọc tệp tài khoản dịch vụ tại đường dẫn: ${serviceAccountPath}`);
-  console.error("Vui lòng kiểm tra lại đường dẫn và quyền truy cập của tệp JSON.");
+  console.error(
+    `Error: Error Read Account Path: ${serviceAccountPath}`
+  );
+  console.error(
+    "Please check the path and access rights of the JSON file."
+  );
   console.error(error);
   process.exit(1);
 }
@@ -30,12 +34,6 @@ const firebaseStoreDB = admin.firestore();
 const auth = admin.auth();
 const storage = admin.storage();
 const realtimeDB = admin.database();
-const adminSdk = admin; 
+const adminSdk = admin;
 
-export {
-  firebaseStoreDB, 
-  auth,
-  storage,
-  realtimeDB,
-  adminSdk
-};
+export { firebaseStoreDB, auth, storage, realtimeDB, adminSdk };
