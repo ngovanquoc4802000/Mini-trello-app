@@ -7,6 +7,7 @@ import { firebaseStoreDB,auth, storage,realtimeDB,adminSdk} from "./firebaseAdmi
 import routerBoard from "./routers/routerBoard.js"
 import routerCards from "./routers/routerCards.js";
 import routerInvite from "./routers/routerInvite.js";
+import routerTasks from "./routers/routerTasks.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,9 +20,10 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use("/boards",routerBoard)
 app.use("/boards/:boardsId/cards", routerCards);
-app.use("/boards/", routerInvite)
+app.use("/boards/", routerInvite);
+app.use("/boards/:boardId/cards/:id/tasks", routerTasks);
 
-app.get("/", (req, res) => {
+app.get("/", (req, res) => {-
   res.status(200).send("<h1> Đã thành công Kết nối Firebase</h1>");
 });
 

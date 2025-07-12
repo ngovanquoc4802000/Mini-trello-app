@@ -74,6 +74,7 @@ const createBoard = async (req, res) => {
     const newBoardData = {
       name: name,
       description: description || "",
+      members: [],
       createdAt: adminSdk.firestore.FieldValue.serverTimestamp(),
     };
     console.log(newBoardData);
