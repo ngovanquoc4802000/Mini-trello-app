@@ -8,7 +8,7 @@ interface CreateBoardProps {
   onClose: () => void;
 }
 
-export const useCreateBoards = ({onClose}: CreateBoardProps ) => {
+export const useCreateBoards = ({ onClose }: CreateBoardProps) => {
   const [value, setValue] = useState<CreateBoardTs>({
     name: "",
     description: "",
@@ -24,7 +24,7 @@ export const useCreateBoards = ({onClose}: CreateBoardProps ) => {
     }));
     console.log(name, value);
   };
-  
+
   const handleCreateBoard = async () => {
     updateBoard();
     onClose();
@@ -39,15 +39,41 @@ export const useCreateBoards = ({onClose}: CreateBoardProps ) => {
       return res;
     },
     onSuccess: (newBoard: Board) => {
-     queryClient.setQueryData(queriesBoards.list.queryKey, (oldData: BoardAll | null | undefined) => {
-    if (!oldData) return { boards: [newBoard] } as BoardAll;
-    return {
-      ...oldData,
-      boards: [newBoard, ...oldData.boards], 
-    };
-  });
-      setValue(value);
-       
+      queryClient.setQueryData(
+        queriesBoards.list.queryKey,
+        (prevData: BoardAll | undefined | null) => {
+          const previousBoards = prevData?.boards || [];
+
+          const existingIndex = previousBoards.findIndex(
+            (board) => board.id === newBoard.id
+          );
+
+          let updatedBoards: Board[];
+          if (existingIndex !== -1) {
+            updatedBoards = [...previousBoards];
+            updatedBoards[existingIndex] = {
+              ...previousBoards[existingIndex],
+              ...newBoard,
+            };
+          } else {
+            // Board chưa có → thêm mới (create)
+            updatedBoards = [newBoard, ...previousBoards];
+          }
+
+          localStorage.setItem("boards", JSON.stringify(updatedBoards));
+
+          return {
+            ...prevData,
+            boards: updatedBoards,
+            success: prevData?.success ?? true,
+            description: prevData?.description ?? "",
+          };
+        }
+      );
+
+      // Reset form input
+      setValue({ name: "", description: "" });
+
       console.log("Create board new success");
     },
     onError: (error) => {
@@ -58,6 +84,6 @@ export const useCreateBoards = ({onClose}: CreateBoardProps ) => {
   return {
     handleBoardTitleChange,
     handleCreateBoard,
-    value
+    value,
   };
 };

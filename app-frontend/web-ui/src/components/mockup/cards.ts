@@ -1,7 +1,14 @@
 export interface CardAll {
   message: string;
   description: string;
+  board: AddBoard;
   cards: Card[];
+}
+
+export interface AddBoard {
+  id: string
+  name: string
+  description: string
 }
 
 export interface CreateCards {

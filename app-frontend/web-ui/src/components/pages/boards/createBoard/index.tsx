@@ -15,14 +15,14 @@ function CreateBoard({ onClose }: CreateBoardProps) {
       onClick={onClose}
     >
       <div
-        className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm relative text-gray-200"
+        className="bg-gray-800  cursor-pointer rounded-lg shadow-xl p-6 w-full max-w-sm relative text-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
           <h3 className="text-xl font-semibold text-white">Create New Board</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-gray-400  cursor-pointer hover:text-white transition-colors"
           >
             <svg
               className="w-6 h-6"
@@ -59,10 +59,10 @@ function CreateBoard({ onClose }: CreateBoardProps) {
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex cursor-pointer justify-end">
           <button
             onClick={handleCreateBoard}
-            className={`px-6 bg-gray-100 text-black cursor-pointer hover:bg-gray-200 py-3 rounded-md font-semibold transition-colors
+            className={`px-3 bg-gray-100 text-black cursor-pointer hover:bg-gray-200 py-3 rounded-md font-semibold transition-colors
              
             `}
           >

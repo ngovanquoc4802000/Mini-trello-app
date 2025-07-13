@@ -3,43 +3,58 @@ import { firebaseStoreDB, adminSdk } from "../firebaseAdmin.js";
 const getCardsAll = async (req, res) => {
   try {
     const { boardsId } = req.params;
+
+    const boardDoc = await firebaseStoreDB.collection("boards").doc(boardsId).get();
+
+    if (!boardDoc.exists) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    const boardData = boardDoc.data();
+
     const cardsSnapshot = await firebaseStoreDB
       .collection("cards")
       .where("boardsId", "==", boardsId)
       .get();
 
-    if (cardsSnapshot.empty) {
-      return res
-        .status(404)
-        .json({ message: "No cards found for this board." });
-    }
-
     const cards = cardsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    res.status(200).json({
-      message: "cards retrieved successfully",
-      description:
-        "Retrieves all cards associated with the authenticated user.",
+
+    return res.status(200).json({
+      success: true,
+      message: "Cards retrieved successfully",
+      description: "Retrieves all cards associated with the board.",
+      board: {
+        id: boardsId,
+        name: boardData.name,         
+        description: boardData.description || "",
+      },
       cards: cards,
     });
   } catch (error) {
     console.error("Error fetching cards:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 const getCardsById = async (req, res) => {
   try {
     const { boardsId, id } = req.params;
+
     const cardsDoc = await firebaseStoreDB.collection("cards").doc(id).get();
+
     if (!cardsDoc.exists)
       return res.status(404).json({ message: "Cards not found" });
+
     const cards = { id: cardsDoc.id, ...cardsDoc.data() };
+
     if (cards.boardsId !== boardsId) {
       return res.status(403).json({ message: "Unauthorized access to cards" });
     }
+
     res.status(200).json({
       message: "cards retrieved successfully",
       description: "Retrieves details of a specific card.",
