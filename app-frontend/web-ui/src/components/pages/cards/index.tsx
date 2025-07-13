@@ -1,13 +1,16 @@
-import logoNotification from "$/assets/logo-notifice.png";
-import logo from "$/assets/logo.png";
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import logoNotification from "$/assets/logo-notifice.png";
+import logo from "$/assets/logo.png";
+import InvitesMember from "../invites";
 import TaskDetails from "../taskDetail";
 import "./styles.scss";
-import InvitesMember from "../invites";
+
 function CardsPage() {
   const [showDetail, setShowDetail] = useState<boolean>(false);
+  
   const [showInvite, setShowInvite] = useState<boolean>(false);
+
   const handleTaskDetail = () => {
     setShowDetail(true);
   };
@@ -80,9 +83,7 @@ function CardsPage() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+          strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             ></path>
           </svg>

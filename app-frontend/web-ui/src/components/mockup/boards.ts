@@ -4,6 +4,11 @@ export interface BoardAll {
   boards: Board[]
 }
 
+export interface CreateBoardTs {
+    name: string;
+    description: string;
+}
+
 export interface Board {
   id: string
   name: string

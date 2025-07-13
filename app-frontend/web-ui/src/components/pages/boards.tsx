@@ -2,12 +2,19 @@ import logoMember from "$/assets/logo-member.png";
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
 import { Link } from "react-router-dom";
-import { useBoards } from "../hooks/useBoards";
 import CreateBoard from "./createBoard";
 import "./styles.scss";
+import { useBoards } from "../hooks/boards/useBoards";
 
 function BoardsPage() {
-  const { handleShowBoard, boardList, isError, isLoading, showBoard, boardId, setShowBoard } = useBoards();
+  const {
+    handleShowBoard,
+    boardList,
+    isError,
+    isLoading,
+    showBoard,
+    setShowBoard,
+  } = useBoards();
   if (isLoading || !boardList) return <div>...Loading</div>;
   if (isError) return <div>...Error</div>;
   return (
@@ -55,9 +62,9 @@ function BoardsPage() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M7 12l3-3m0 0l3 3m-3-3v6M12 2a10 10 0 100 20 10 10 0 000-20z"
                     ></path>
                   </svg>
@@ -86,12 +93,9 @@ function BoardsPage() {
             Your Workspaces
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {boardList.boards.map((item) => (
-              <Link to={`/boards/${boardId}/cards`}>
-                <div
-                  key={item.id}
-                  className="bg-gray-700 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col justify-between"
-                >
+            {boardList.boards.map((item, index) => (
+              <Link key={index} to={`/boards/${item.id}/cards`}>
+                <div className="bg-gray-700 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col justify-between">
                   <h3 className="text-xl font-semibold mb-8 text-white">
                     {item.name}
                   </h3>
@@ -113,9 +117,9 @@ function BoardsPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 ></path>
               </svg>
