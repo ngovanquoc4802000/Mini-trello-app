@@ -1,4 +1,4 @@
-import { useCreateBoards } from "../../hooks/boards/useCreateBoards";
+import { useCreateBoards } from "../../../hooks/boards/useCreateBoards";
 
 interface CreateBoardProps {
   onClose: () => void;

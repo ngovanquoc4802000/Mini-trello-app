@@ -2,9 +2,9 @@ import logoMember from "$/assets/logo-member.png";
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
 import { Link } from "react-router-dom";
-import CreateBoard from "./createBoard";
 import "./styles.scss";
-import { useBoards } from "../hooks/boards/useBoards";
+import { useBoards } from "../../hooks/boards/useBoards";
+import CreateBoard from "./createBoard";
 
 function BoardsPage() {
   const {
@@ -15,7 +15,9 @@ function BoardsPage() {
     showBoard,
     setShowBoard,
   } = useBoards();
+  
   if (isLoading || !boardList) return <div>...Loading</div>;
+
   if (isError) return <div>...Error</div>;
   return (
     <div className="boards-page bg-gray-800 min-h-screen flex flex-col">

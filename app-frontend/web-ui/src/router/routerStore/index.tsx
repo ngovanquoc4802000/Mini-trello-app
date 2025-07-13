@@ -1,4 +1,4 @@
-import BoardsPage from "../../components/pages/boards";
+import BoardsPage from "../../components/pages/boards/boards";
 import CardsPage from "../../components/pages/cards";
 import TaskDetails from "../../components/pages/taskDetail";
 

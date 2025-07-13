@@ -1,22 +1,58 @@
 import { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
 import InvitesMember from "../invites";
 import TaskDetails from "../taskDetail";
+import queriesCards from "../../queries/cards";
 import "./styles.scss";
+import type { CreateCards } from "../../mockup/cards";
 
 function CardsPage() {
-  const [showDetail, setShowDetail] = useState<boolean>(false);
   
+  const [showDetail, setShowDetail] = useState<boolean>(false);
+
   const [showInvite, setShowInvite] = useState<boolean>(false);
+  
+  const [showAddListInput, setShowAddListInput] = useState<boolean>(false);
+  
+  const [value, setValue] = useState<CreateCards>({
+    name: "",
+    description: "",
+  });
+  const { boardId } = useParams();
+  
+  
+  const {
+    isLoading,
+    isError,
+    data: cartList,
+  } = useQuery({
+    ...queriesCards.list(boardId ?? ""),
+    enabled: !!boardId,
+  });
 
   const handleTaskDetail = () => {
     setShowDetail(true);
   };
+
   const handleInvite = () => {
     setShowInvite(true);
   };
+  const handleChangeListInput = (e: {
+    target: { name: string; value: string };
+  }) => {
+    const { name, value } = e.target;
+    setValue((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  if (isLoading || !cartList) return <div>...Loading</div>;
+
+  if (isError) return <div>...Error</div>;
+
   return (
     <div className="cards-page bg-gray-800 text-gray-100 min-h-screen flex flex-col">
       <header className="bg-gray-900 p-4 flex items-center justify-between">
@@ -49,9 +85,10 @@ function CardsPage() {
               <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
             </div>
           </button>
-         <Link to="/boards">
-          <img src={logo} className="h-8 w-8" alt="Logo" />
-         </Link>
+
+          <Link to="/boards">
+            <img src={logo} className="h-8 w-8" alt="Logo" />
+          </Link>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -83,7 +120,9 @@ function CardsPage() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-          strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             ></path>
           </svg>
@@ -243,13 +282,60 @@ function CardsPage() {
             </button>
           </div>
           {showInvite && <InvitesMember onClose={() => setShowInvite(false)} />}
-          <div className="flex space-x-4 items-start h-full">
-            <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-lg">To do</h3>
-                <button className="text-gray-400 hover:text-gray-200">
+
+          {cartList.cards.map((item, index) => (
+            <div key={index} className="flex space-x-4 items-start h-full">
+              <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-lg">{item.name}</h3>
+                  <button className="text-gray-400 hover:text-gray-200">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+
+                {/* detail nhé */}
+                <div
+                  onClick={handleTaskDetail}
+                  className="bg-gray-800 p-3 cursor-pointer rounded-lg shadow-md mb-3"
+                >
+                  <p className="text-sm">Project planning</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
+                      SD
+                    </div>
+                  </div>
+                </div>
+                {showDetail && (
+                  <>
+                    <TaskDetails onClose={() => setShowDetail(false)} />
+                  </>
+                )}
+
+                <div className="bg-gray-800 p-3 rounded-lg shadow-md mb-3">
+                  <p className="text-sm">Kickoff meeting</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
+                      SD
+                    </div>
+                  </div>
+                </div>
+
+                <button className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-600 flex items-center text-sm">
                   <svg
-                    className="h-5 w-5"
+                    className="h-4 w-4 mr-2"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -259,161 +345,64 @@ function CardsPage() {
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     ></path>
                   </svg>
+                  Add a card
                 </button>
               </div>
-
-              <div
-                onClick={handleTaskDetail}
-                className="bg-gray-800 p-3 cursor-pointer rounded-lg shadow-md mb-3"
-              >
-                <p className="text-sm">Project planning</p>
-                <div className="flex justify-between items-center mt-2">
-                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
-                    SD
+              {showAddListInput ? (
+                <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0 w-64">
+                  <input
+                    type="text"
+                    value={value.name}
+                    onChange={handleChangeListInput}
+                    placeholder="Enter list name..."
+                    className="w-full px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+                  />
+                  <div className="flex  mt-2">
+                    <button
+                      onClick={() => {
+                        setShowAddListInput(false);
+                      }}
+                      className="bg-blue-600 text-white px-5 cursor-pointer py-1.5 rounded hover:bg-blue-500 text-[18px]"
+                    >
+                      Add list
+                    </button>
+                    <button
+                      onClick={() => setShowAddListInput(false)}
+                      className="text-white ml-2 cursor-pointer text-[30px] rounded-[4px] hover:bg-gray-200 px-2 hover:text-gray-800"
+                    >
+                      ×
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              {showDetail && (
-                <>
-                  <TaskDetails onClose={() => setShowDetail(false)} />
-                </>
+              ) : (
+                <div>
+                  <button
+                    onClick={() => setShowAddListInput(true)}
+                    className="kanban-list hover:bg-gray-400 hover:text-white cursor-pointer bg-gray-700 bg-opacity-50 text-gray-300 p-4 rounded-lg flex-shrink-0 hover:bg-opacity-70 transition duration-200 flex items-center justify-self-end"
+                  >
+                    <svg
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      ></path>
+                    </svg>
+                    Add another list
+                  </button>
+                </div>
               )}
-
-              <div className="bg-gray-800 p-3 rounded-lg shadow-md mb-3">
-                <p className="text-sm">Kickoff meeting</p>
-                <div className="flex justify-between items-center mt-2">
-                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
-                    SD
-                  </div>
-                </div>
-              </div>
-              <button className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-600 flex items-center text-sm">
-                <svg
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                Add a card
-              </button>
             </div>
-
-            <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-lg">Doing</h3>
-                <button className="text-gray-400 hover:text-gray-200">
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-              <button className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-600 flex items-center text-sm">
-                <svg
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                Add a card
-              </button>
-            </div>
-
-            <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-lg">Done</h3>
-                <button className="text-gray-400 hover:text-gray-200">
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-              <div className="bg-gray-800 p-3 rounded-lg shadow-md mb-3">
-                <p className="text-sm">Kickoff meeting</p>
-                <div className="flex justify-between items-center mt-2">
-                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
-                    SD
-                  </div>
-                </div>
-              </div>
-              <button className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-600 flex items-center text-sm">
-                <svg
-                  className="h-4 w-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                Add a card
-              </button>
-            </div>
-
-            <button className="kanban-list bg-gray-700 bg-opacity-50 text-gray-300 p-4 rounded-lg flex-shrink-0 hover:bg-opacity-70 transition duration-200 flex items-center justify-self-end">
-              <svg
-                className="h-5 w-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                ></path>
-              </svg>
-              Add another list
-            </button>
-          </div>
+          ))}
         </main>
       </div>
       <Outlet />
