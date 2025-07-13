@@ -1,0 +1,61 @@
+.sidebar-backdrop::-webkit-scrollbar {
+  height: 8px; 
+  width: 8px; 
+}
+
+.kanban-scrollable::-webkit-scrollbar-track {
+  background: #1a202c; 
+}
+
+.kanban-scrollable::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+.kanban-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0; 
+}
+
+.members-scrollable::-webkit-scrollbar {
+  width: 4px; 
+}
+.members-scrollable::-webkit-scrollbar-track {
+  background: #2d3748; 
+}
+.members-scrollable::-webkit-scrollbar-thumb {
+  background: #4a5568; 
+  border-radius: 2px;
+}
+.members-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0; 
+}
+
+.kanban-list {
+  min-width: 272px; 
+}
+
+.sidebar-overlay {
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+.sidebar-overlay.open {
+  transform: translateX(0);
+}
+@media (min-width: 768px) {
+  .md\:sidebar-overlay-none {
+    transform: translateX(0) !important;
+    position: static !important; 
+  }
+}
+
+.sidebar-backdrop {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease-in-out,
+    visibility 0.3s ease-in-out;
+}
+.sidebar-backdrop.open {
+  opacity: 0.5;
+  visibility: visible;
+}

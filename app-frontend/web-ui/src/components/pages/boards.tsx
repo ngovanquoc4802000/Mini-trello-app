@@ -1,12 +1,24 @@
-import logo from "$/assets/logo.png";
 import logoMember from "$/assets/logo-member.png";
 import logoNotification from "$/assets/logo-notifice.png";
+import logo from "$/assets/logo.png";
+import CreateBoard from "./createBoard";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import "./styles.scss";
 function BoardsPage() {
+  const [showBoard,setShowBoard] = useState(false);
+  
+  const { boardId} = useParams();
+  
+  const handleShowBoard = () => {
+    setShowBoard(true);
+  }
+
   return (
     <div className="boards-page bg-gray-800 min-h-screen flex flex-col">
       <header className="bg-gray-900 p-4 flex items-center justify-between">
         <div className="flex items-center">
+          
           <button className="p-1.5 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 mr-2">
             <div className="grid grid-cols-2 gap-0.5">
               <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
@@ -15,6 +27,7 @@ function BoardsPage() {
               <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
             </div>
           </button>
+
           <img src={logo} className="h-8 w-8" alt="Logo" />
         </div>
         <div className="flex items-center space-x-4">
@@ -72,21 +85,26 @@ function BoardsPage() {
             </ul>
           </nav>
         </aside>
+
         <main className="flex-1 p-6 overflow-auto">
           <h2 className="text-gray-400 uppercase tracking-wide font-semibold mb-6">
             Your Workspaces
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+           <Link to={`/boards/${boardId}/cards`}>
             <div className="bg-gray-700 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col justify-between">
-              <h3 className="text-xl font-semibold mb-4 text-white">
+              <h3 className="text-xl font-semibold mb-8 text-white">
                 My Trello board
               </h3>
               <div className="text-gray-400 text-sm">
                 <p>A personal board for managing tasks.</p>
               </div>
             </div>
-
-            <div className="bg-gray-700 p-6 rounded-lg shadow-md border-2 border-dashed border-gray-600  text-gray-400 flex flex-col items-center justify-center hover:bg-gray-600 lg:hover:bg-gray-600 md:hover:bg-gray-600 transition-colors duration-200 cursor-pointer">
+           </Link>
+           
+            <div 
+            onClick={handleShowBoard}
+            className="bg-gray-700 p-6 rounded-lg shadow-md border-2 border-dashed border-gray-600  text-gray-400 flex flex-col items-center justify-center hover:bg-gray-600 lg:hover:bg-gray-600 md:hover:bg-gray-600 transition-colors duration-200 cursor-pointer">
               <svg
                 className="h-10 w-10 mb-2"
                 fill="none"
@@ -103,6 +121,9 @@ function BoardsPage() {
               </svg>
               <span className="text-lg">Create a new board</span>
             </div>
+            {
+              showBoard && <CreateBoard onClose={() => setShowBoard(false)} />
+            }
           </div>
         </main>
       </div>
