@@ -1,10 +1,11 @@
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 import type { CreateCards } from "../../mockup/cards";
 import queriesCards from "../../queries/cards";
+import { createCards } from "../../service/cards";
 import CreateBoard from "../boards/createBoard";
 import InvitesMember from "../invites";
 import TasksPage from "../tasks";
@@ -19,7 +20,7 @@ function CardsPage() {
 
   const [showAddListInput, setShowAddListInput] = useState<boolean>(false);
 
-  const [showAddCard, setShowAddCard] = useState<boolean>(false);
+  const [showAddCard, setShowAddCard] = useState<string | null>(null);
 
   const [showAddNewBoard, setShowAddNewBoard] = useState<boolean>(false);
 
@@ -47,11 +48,34 @@ function CardsPage() {
     target: { name: string; value: string };
   }) => {
     const { name, value } = e.target;
+    console.log(name, value);
     setCards((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
+  const queryClient = useQueryClient();
+  const handleAddCards = () => {
+    updateCards();
+    setShowAddListInput(false);
+  };
+  const { mutate: updateCards } = useMutation({
+    mutationFn: async () => {
+      const response = await createCards(boardId ?? "",cards);
+      if (!response) {
+        throw new Error("Failed to create board");
+      }
+      return response;
+    },
+   onSuccess: () => {
+    // Đảm bảo queryKey giống hệt với useQuery
+    queryClient.invalidateQueries({...queriesCards.list});
+
+  setCards({ name: "", description: "" });
+  setShowAddListInput(false);
+  },
+});
+
 
   if (isLoading || !cartList) return <div>...Loading</div>;
 
@@ -139,47 +163,46 @@ function CardsPage() {
           {findName}
         </h2>{" "}
         <div className="flex">
-        <button
-          onClick={() => setShowAddNewBoard(true)}
-          className="bg-gray-700  mr-3 text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
-        >
-          <svg
-            className="h-4 w-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+          <button
+            onClick={() => setShowAddNewBoard(true)}
+            className="bg-gray-700  mr-3 text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            ></path>
-          </svg>
-          New
-        </button>
-        <button
-          onClick={handleInvite}
-          className="bg-gray-700  text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
-        >
-          <svg
-            className="h-4 w-4 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+            <svg
+              className="h-4 w-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
+            New
+          </button>
+          <button
+            onClick={handleInvite}
+            className="bg-gray-700  text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            ></path>
-          </svg>
-          Invite member
-        </button>
-
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              ></path>
+            </svg>
+            Invite member
+          </button>
         </div>
         {showAddNewBoard && (
           <CreateBoard onClose={() => setShowAddNewBoard(false)} />
@@ -288,13 +311,15 @@ function CardsPage() {
           </div>
         </aside>
 
-        <main className="flex-1 p-6 md:p-8 bg-gray-800 overflow-x-auto kanban-scrollable">
-
+        <main className="flex-1 p-6 md:p-8 bg-gray-800 overflow-x-auto">
           {showInvite && <InvitesMember onClose={() => setShowInvite(false)} />}
 
-          {cartList.cards.map((item, index) => (
-            <div key={index} className="flex space-x-4 items-start h-full">
-              <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0">
+          <div className="flex  space-x-4 p-4">
+            {cartList.cards.map((item, index) => (
+              <div
+                key={index}
+                className="kanban-list bg-gray-700 w-64 flex-shrink-0 rounded-lg p-4"
+              >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-semibold text-lg">{item.name}</h3>
                   <button className="text-gray-400 hover:text-gray-200">
@@ -303,112 +328,101 @@ function CardsPage() {
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
                         d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                      ></path>
+                      />
                     </svg>
                   </button>
                 </div>
 
-                {/* detail nhé */}
                 {item.id && (
                   <TasksPage boardId={boardId ?? ""} cardId={item.id} />
                 )}
 
-                {showDetail && (
-                  <>
-                    <TaskDetails  setShowDetail={setShowDetail} />
-                  </>
-                )}
+                {showDetail && <TaskDetails setShowDetail={setShowDetail} />}
 
-                {showAddCard ? (
+                {showAddCard === item.id ? (
                   <CreateTasksPages
                     item={item.id}
-                    setShowAddCard={setShowAddCard}
+                    setShowAddCard={() => setShowAddCard(null)}
                   />
                 ) : (
-                  <>
-                    <button
-                      onClick={() => setShowAddCard(true)}
-                      className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-600 flex items-center text-sm"
-                    >
-                      <svg
-                        className="h-4 w-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        ></path>
-                      </svg>
-                      Add a card
-                    </button>
-                  </>
-                )}
-              </div>
-              {showAddListInput ? (
-                <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0 w-64">
-                  <input
-                    type="text"
-                    value={cards.name}
-                    name="name"
-                    onChange={handleChangeCardsInput}
-                    placeholder="Enter list name..."
-                    className="w-full px-2 py-2 text-[14px] rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
-                  />
-                  <div className="flex  mt-2">
-                    <button
-                      onClick={() => {
-                        setShowAddListInput(false);
-                      }}
-                      className="bg-blue-600 text-white px-4 cursor-pointer py-1 rounded hover:bg-blue-500 text-[14px]"
-                    >
-                      Add list
-                    </button>
-                    <button
-                      onClick={() => setShowAddListInput(false)}
-                      className="text-white ml-2 cursor-pointer text-[30px] rounded-[4px] hover:bg-gray-200 px-2 hover:text-gray-800"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div>
                   <button
-                    onClick={() => setShowAddListInput(true)}
-                    className="kanban-list hover:bg-gray-400 hover:text-white cursor-pointer bg-gray-700 bg-opacity-50 text-gray-300 p-4 rounded-lg flex-shrink-0 hover:bg-opacity-70 transition duration-200 flex items-center justify-self-end"
+                    onClick={() => setShowAddCard(item.id)}
+                    className="w-full text-left text-gray-400 p-2 rounded-lg hover:bg-gray-800 hover:text-white cursor-pointer flex items-center text-sm"
                   >
                     <svg
-                      className="h-5 w-5 mr-2"
+                      className="h-4 w-4 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      ></path>
+                      />
                     </svg>
-                    Add another list
+                    Add a card
+                  </button>
+                )}
+              </div>
+            ))}
+
+            {showAddListInput ? (
+              <div className="kanban-list bg-gray-700 w-64 flex-shrink-0 p-4 rounded-lg">
+                <input
+                  type="text"
+                  value={cards.name}
+                  name="name"
+                  autoFocus
+                  onChange={handleChangeCardsInput}
+                  placeholder="Enter list title..."
+                  className="w-full px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+                />
+                <div className="flex mt-2 items-center space-x-2">
+                  <button
+                    onClick={handleAddCards}
+                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 text-sm"
+                  >
+                    Add list
+                  </button>
+                  <button
+                    onClick={() => setShowAddListInput(false)}
+                    className="text-white text-2xl hover:text-gray-400"
+                  >
+                    ×
                   </button>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAddListInput(true)}
+                className="bg-gray-700 bg-opacity-50 cursor-pointer hover:bg-gray-500  text-gray-300 p-4 w-64 rounded-lg flex-shrink-0 flex items-baseline justify-baseline" 
+              >
+                <svg
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add another list
+              </button>
+            )}
+          </div>
+
           <Outlet />
         </main>
       </div>

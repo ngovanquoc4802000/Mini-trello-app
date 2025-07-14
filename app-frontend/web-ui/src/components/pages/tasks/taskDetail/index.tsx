@@ -1,26 +1,91 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import queriesTasks from "../../../queries/tasks";
+import { useEffect, useState } from "react";
 
+interface Comment {
+  id: string;
+  valueComment: string;
+  createdAt: number;
+}
 interface TaskDetailState {
   setShowDetail?: React.Dispatch<React.SetStateAction<boolean>> | undefined;
+  description?: string;
 }
 function TaskDetails({ setShowDetail }: TaskDetailState) {
   const navigate = useNavigate();
-
   const { boardId, cardId, taskId } = useParams();
+  const [description, setDescription] = useState("");
+  const [comment, setComment] = useState({
+    valueComment: "",
+  });
+  const [commentArr, setCommentArr] = useState<Comment[]>([]);
 
   const { data, isLoading, isError } = useQuery(
     queriesTasks.detail(boardId!, cardId!, taskId!)
   );
-  const task = data?.task;
-  const handleClose = () => {
-    if (setShowDetail) setShowDetail(false);
+  const handleAddComment = () => {
+    if (taskId && comment.valueComment.trim()) {
 
+      const newComment = {
+        id: Date.now().toString(),
+        valueComment: comment.valueComment,
+        createdAt: Date.now(),
+      };
+      const updatedComments = [...commentArr, newComment];
+      setCommentArr(updatedComments);
+      localStorage.setItem(
+        `task-${taskId}-comments`,
+        JSON.stringify(updatedComments)
+      );
+      setComment({ valueComment: "" });
+    }
+  };
+  const handleComment = (e: { target: { name: string; value: string } }) => {
+    const { name, value } = e.target;
+    console.log(name,value)
+    setComment((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (taskId) {
+      const savedDescription = localStorage.getItem(
+        `task-${taskId}-description`
+      );
+      if (savedDescription) setDescription(savedDescription);
+
+      const savedComments = localStorage.getItem(`task-${taskId}-comments`);
+      if (savedComments) setCommentArr(JSON.parse(savedComments));
+    }
+  }, [taskId]);
+  const task = data?.task;
+
+  const handleClose = () => {
+    if (setShowDetail) {
+      setShowDetail(false);
+    }
     navigate(`/boards/${boardId}/cards`);
   };
 
-  if (isLoading) return <div>...loading</div>;
+  const handleSave = () => {
+    if (taskId) {
+      localStorage.setItem(`task-${taskId}-description`, description);
+    }
+    if (setShowDetail) {
+      setShowDetail(false);
+    }
+    navigate(`/boards/${boardId}/cards`);
+  };
+  const handleTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
+  };
+
+  if (isLoading || !task) return <div>...loading</div>;
+
+  if (isError) return <div>...Error</div>;
 
   return (
     <div className="z-[1000] fixed top-0 left-0 right-0 bottom-0 bg-black/50 min-h-screen bg-black/50 text-white flex items-center justify-center  bg-black/70 min-h-screen  text-white p-4 sm:p-6 md:p-8">
@@ -44,12 +109,7 @@ function TaskDetails({ setShowDetail }: TaskDetailState) {
             ></path>
           </svg>
         </button>
-        {isError && (
-          <p className="text-center text-red-400">Error loading task</p>
-        )}
-        {!task && !isLoading && !isError && (
-          <p className="text-center text-yellow-400">Task not found</p>
-        )}
+
         {task && (
           <>
             <div className="mb-6 pb-4 border-b border-gray-700">
@@ -111,9 +171,24 @@ function TaskDetails({ setShowDetail }: TaskDetailState) {
                     </span>
                   </div>
                   <textarea
+                    value={description}
+                    onChange={handleTextarea}
+                    name="description"
                     className="w-full p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:border-blue-500 resize-y min-h-[80px]"
                     placeholder="Add a more detailed description"
                   ></textarea>
+                  <div className="text-right">
+                    {description === "" ? (
+                      ""
+                    ) : (
+                      <button
+                        onClick={handleSave}
+                        className="text-right bg-blue-600 p-1 rounded-[4px] text-[16px] cursor-pointer"
+                      >
+                        Save
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -137,18 +212,48 @@ function TaskDetails({ setShowDetail }: TaskDetailState) {
                         Activity
                       </span>
                     </div>
-                    <button className="px-3 py-1 bg-gray-700 rounded-md text-sm text-gray-300 hover:bg-gray-600">
+
+                    <button className="px-3 text-[14px] py-1 bg-gray-700 rounded-md text-sm text-gray-300 hover:bg-gray-600">
                       Show details
                     </button>
+                  </div>
+
+                  <div className="space-y-3 mb-4">
+                    {commentArr.map((item) => (
+                      <div key={item.id} className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-red-500 flex-shrink-0 flex items-center justify-center text-sm font-bold">
+                          SD
+                        </div>
+                        <div className="bg-gray-700 p-3 rounded-md flex-1">
+                          <div className="text-sm">{item.valueComment}</div>
+                          <div className="text-gray-400 text-xs mt-1">
+                            {new Date(item.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 rounded-full bg-red-500 flex-shrink-0 flex items-center justify-center text-sm font-bold">
                       SD
                     </div>
+
                     <textarea
-                      className="flex-grow p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:border-blue-500 resize-y min-h-[40px]"
+                      value={comment.valueComment}
+                      onChange={handleComment}
+                      name="valueComment"
+                      className="flex-grow mr-[-0rem] p-3 bg-gray-700 rounded-md border border-gray-600 focus:outline-none focus:border-blue-500 resize-y min-h-[40px]"
                       placeholder="Write a comment"
                     ></textarea>
+                  </div>
+
+                  <div className="text-right mt-[2px]">
+                    <button
+                      onClick={handleAddComment}
+                      className=" bg-gray-600 p-1 rounded-[4px] mt-1 "
+                    >
+                      Send
+                    </button>
                   </div>
                 </div>
               </div>

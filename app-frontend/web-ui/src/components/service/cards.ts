@@ -1,4 +1,4 @@
-import type { Card, CardAll, CreateCards } from "../mockup/cards";
+import type { CardAll, CreateCards } from "../mockup/cards";
 import { Request } from "../utils/https";
 
 
@@ -12,9 +12,9 @@ export const getAllCards = async(boardId: string) => {
     }
 }
 
-export const createCards = async(payload: CreateCards) => {
+export const createCards = async(boardId: string,payload: CreateCards) => {
   try {
-  const response = await Request.post<Card>("",payload);
+  const response = await Request.post<CardAll>(`/${boardId}/cards`,payload);
   return response.data;
   } catch(error) {
     console.log("Error create cards " + error);

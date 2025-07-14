@@ -40,7 +40,7 @@ function CreateTasksPages({ setShowAddCard, item }: TasksPagesProps) {
       await queryClient.cancelQueries({ queryKey: ["tasks", boardId, item] });
       const previousTasks = queryClient.getQueryData(["tasks", boardId, item]);
       queryClient.setQueryData(["tasks", boardId, item], (old: TasksAll | undefined) => {
-        return {
+        return { 
           success: true,
           tasks: [...(old?.tasks ?? []), tasks],
         };
