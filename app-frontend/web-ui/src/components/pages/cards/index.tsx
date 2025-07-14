@@ -11,6 +11,7 @@ import "./styles.scss";
 import CreateBoard from "../boards/createBoard";
 
 function CardsPage() {
+
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const [showInvite, setShowInvite] = useState<boolean>(false);
@@ -21,7 +22,11 @@ function CardsPage() {
 
   const [showAddNewBoard, setShowAddNewBoard] = useState<boolean>(false);
 
-  const [value, setValue] = useState<CreateCards>({
+  const [cards, setCards] = useState<CreateCards>({
+    name: "",
+    description: "",
+  });
+  const [tasks, setTasks] = useState<CreateCards>({
     name: "",
     description: "",
   });
@@ -43,15 +48,25 @@ function CardsPage() {
   const handleInvite = () => {
     setShowInvite(true);
   };
-  const handleChangeListInput = (e: {
+  /* mai làm create 2 cái này */
+  const handleChangeCardsInput = (e: {
     target: { name: string; value: string };
   }) => {
     const { name, value } = e.target;
-    setValue((prev) => ({
+    setCards((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
+  const handleChangeTasksInput =(e: {
+    target: { name: string; value: string };
+  }) => {
+    const { name, value } = e.target;
+     setTasks((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
   if (isLoading || !cartList) return <div>...Loading</div>;
 
   if (isError) return <div>...Error</div>;
@@ -344,8 +359,9 @@ function CardsPage() {
                   <div className=" bg-gray-800 p-3 rounded-lg shadow-md mb-3">
                     <input
                       type="text"
-                      value={value.name}
-                      onChange={handleChangeListInput}
+                      value={tasks.name}
+                      name="name"
+                      onChange={handleChangeTasksInput}
                       placeholder="Enter title or paste link..."
                       className="w-200px px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
                     />
@@ -395,8 +411,9 @@ function CardsPage() {
                 <div className="kanban-list bg-gray-700 p-4 rounded-lg flex-shrink-0 w-64">
                   <input
                     type="text"
-                    value={value.name}
-                    onChange={handleChangeListInput}
+                    value={cards.name}
+                    name="name"
+                    onChange={handleChangeCardsInput}
                     placeholder="Enter list name..."
                     className="w-full px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
                   />
