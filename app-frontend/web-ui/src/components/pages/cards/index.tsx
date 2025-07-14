@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 import type { CreateCards } from "../../mockup/cards";
 import queriesCards from "../../queries/cards";
-import InvitesMember from "../invites";
-import TaskDetails from "../taskDetail";
-import "./styles.scss";
 import CreateBoard from "../boards/createBoard";
+import InvitesMember from "../invites";
+import TasksPage from "../tasks";
+import TaskDetails from "../tasks/taskDetail";
+import "./styles.scss";
 
 function CardsPage() {
 
@@ -26,10 +27,7 @@ function CardsPage() {
     name: "",
     description: "",
   });
-  const [tasks, setTasks] = useState<CreateCards>({
-    name: "",
-    description: "",
-  });
+
   const { boardId } = useParams();
 
   const {
@@ -40,7 +38,9 @@ function CardsPage() {
     ...queriesCards.list(boardId ?? ""),
     enabled: !!boardId,
   });
+
   const findName = cartList?.board.name;
+  
   const handleTaskDetail = () => {
     setShowDetail(true);
   };
@@ -58,15 +58,7 @@ function CardsPage() {
       [name]: value,
     }));
   };
-  const handleChangeTasksInput =(e: {
-    target: { name: string; value: string };
-  }) => {
-    const { name, value } = e.target;
-     setTasks((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
+ 
   if (isLoading || !cartList) return <div>...Loading</div>;
 
   if (isError) return <div>...Error</div>;
@@ -87,9 +79,9 @@ function CardsPage() {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+              strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                 d="M4 6h16M4 12h16M4 18h16"
               ></path>
             </svg>
@@ -165,9 +157,9 @@ function CardsPage() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+             strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             ></path>
           </svg>
@@ -203,9 +195,9 @@ function CardsPage() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                   strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                       d="M7 12l3-3m0 0l3 3m-3-3v6M12 2a10 10 0 100 20 10 10 0 000-20z"
                     ></path>
                   </svg>
@@ -225,9 +217,9 @@ function CardsPage() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                     strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M9 20v-2m3 2v-2m3 2v-2m-9 0h1.5a3 3 0 003-3V6a3 3 0 00-3-3H9m12 0h-1.5a3 3 0 00-3 3v10a3 3 0 003 3H21"
                     ></path>
                   </svg>
@@ -294,9 +286,9 @@ function CardsPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+               strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 ></path>
               </svg>
@@ -356,32 +348,7 @@ function CardsPage() {
                 </div>
 
                 {showAddCard ? (
-                  <div className=" bg-gray-800 p-3 rounded-lg shadow-md mb-3">
-                    <input
-                      type="text"
-                      value={tasks.name}
-                      name="name"
-                      onChange={handleChangeTasksInput}
-                      placeholder="Enter title or paste link..."
-                      className="w-200px px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
-                    />
-                    <div className="flex mt-2">
-                      <button
-                        onClick={() => {
-                          setShowAddCard(false);
-                        }}
-                        className="bg-blue-600 text-white px-4 cursor-pointer py-1 rounded hover:bg-blue-500 text-[16px]"
-                      >
-                        Add card
-                      </button>
-                      <button
-                        onClick={() => setShowAddCard(false)}
-                        className="text-white ml-2 cursor-pointer text-[30px] rounded-[4px] hover:bg-gray-200 px-2 hover:text-gray-800"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
+                   <TasksPage setShowAddCard={setShowAddCard} />
                 ) : (
                   <>
                     <button
@@ -396,9 +363,9 @@ function CardsPage() {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                        strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                         ></path>
                       </svg>
@@ -415,14 +382,14 @@ function CardsPage() {
                     name="name"
                     onChange={handleChangeCardsInput}
                     placeholder="Enter list name..."
-                    className="w-full px-3 py-2 text-sm rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+                    className="w-full px-2 py-2 text-[14px] rounded border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
                   />
                   <div className="flex  mt-2">
                     <button
                       onClick={() => {
                         setShowAddListInput(false);
                       }}
-                      className="bg-blue-600 text-white px-4 cursor-pointer py-1 rounded hover:bg-blue-500 text-[16px]"
+                      className="bg-blue-600 text-white px-4 cursor-pointer py-1 rounded hover:bg-blue-500 text-[14px]"
                     >
                       Add list
                     </button>
@@ -448,9 +415,9 @@ function CardsPage() {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       ></path>
                     </svg>

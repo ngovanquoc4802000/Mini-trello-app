@@ -1,6 +1,6 @@
 import BoardsPage from "../../components/pages/boards/boards";
 import CardsPage from "../../components/pages/cards";
-import TaskDetails from "../../components/pages/taskDetail";
+import TasksPage from "../../components/pages/tasks";
 
 export const routerStore = [
   {
@@ -13,8 +13,8 @@ export const routerStore = [
     element: <CardsPage />,
      children: [
       {
-        path: ":id/tasks",
-        element: <TaskDetails />,
+        path: ":cardId/tasks",
+        element: <TasksPage/>,
       }
     ]
   },
