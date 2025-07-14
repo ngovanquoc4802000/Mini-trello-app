@@ -7,12 +7,12 @@ import type { CreateCards } from "../../mockup/cards";
 import queriesCards from "../../queries/cards";
 import CreateBoard from "../boards/createBoard";
 import InvitesMember from "../invites";
-import TasksPage from "../tasks";
+import CreateTasks from "../tasks/createTaks";
 import TaskDetails from "../tasks/taskDetail";
 import "./styles.scss";
+import TasksPage from "../tasks";
 
 function CardsPage() {
-
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const [showInvite, setShowInvite] = useState<boolean>(false);
@@ -36,19 +36,19 @@ function CardsPage() {
     data: cartList,
   } = useQuery({
     ...queriesCards.list(boardId ?? ""),
-    enabled: !!boardId,
   });
 
   const findName = cartList?.board.name;
-  
-  const handleTaskDetail = () => {
-    setShowDetail(true);
+
+  const handleTaskDetail = (cardId: string) => {
+    if (boardId && cardId) {
+      setShowDetail(true);
+    }
   };
 
   const handleInvite = () => {
     setShowInvite(true);
   };
-  /* mai làm create 2 cái này */
   const handleChangeCardsInput = (e: {
     target: { name: string; value: string };
   }) => {
@@ -58,7 +58,7 @@ function CardsPage() {
       [name]: value,
     }));
   };
- 
+
   if (isLoading || !cartList) return <div>...Loading</div>;
 
   if (isError) return <div>...Error</div>;
@@ -79,9 +79,9 @@ function CardsPage() {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-              strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M4 6h16M4 12h16M4 18h16"
               ></path>
             </svg>
@@ -157,15 +157,17 @@ function CardsPage() {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-             strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             ></path>
           </svg>
           New
         </button>
-        {showAddNewBoard && <CreateBoard onClose={() => setShowAddNewBoard(false)}/>}
+        {showAddNewBoard && (
+          <CreateBoard onClose={() => setShowAddNewBoard(false)} />
+        )}
       </div>
       <div className="flex flex-1 relative">
         <div
@@ -195,9 +197,9 @@ function CardsPage() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M7 12l3-3m0 0l3 3m-3-3v6M12 2a10 10 0 100 20 10 10 0 000-20z"
                     ></path>
                   </svg>
@@ -217,9 +219,9 @@ function CardsPage() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                     strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M9 20v-2m3 2v-2m3 2v-2m-9 0h1.5a3 3 0 003-3V6a3 3 0 00-3-3H9m12 0h-1.5a3 3 0 00-3 3v10a3 3 0 003 3H21"
                     ></path>
                   </svg>
@@ -286,7 +288,7 @@ function CardsPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-               strokeLinecap="round"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
@@ -295,6 +297,7 @@ function CardsPage() {
               Invite member
             </button>
           </div>
+          
           {showInvite && <InvitesMember onClose={() => setShowInvite(false)} />}
 
           {cartList.cards.map((item, index) => (
@@ -321,34 +324,22 @@ function CardsPage() {
                 </div>
 
                 {/* detail nhé */}
-                <div
-                  onClick={handleTaskDetail}
-                  className="bg-gray-800 p-3 cursor-pointer rounded-lg shadow-md mb-3"
-                >
-                  <p className="text-sm">Project planning</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
-                      SD
-                    </div>
-                  </div>
-                </div>
+                {item.id  && (
+                  <TasksPage
+                    boardId={boardId ?? ""}
+                    cardId={item.id}
+                    handleTaskDetail={() => handleTaskDetail(item.id)}
+                  />
+                )}
+
                 {showDetail && (
                   <>
                     <TaskDetails onClose={() => setShowDetail(false)} />
                   </>
                 )}
 
-                <div className="bg-gray-800 p-3 rounded-lg shadow-md mb-3">
-                  <p className="text-sm">Kickoff meeting</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
-                      SD
-                    </div>
-                  </div>
-                </div>
-
                 {showAddCard ? (
-                   <TasksPage setShowAddCard={setShowAddCard} />
+                  <CreateTasks setShowAddCard={setShowAddCard} />
                 ) : (
                   <>
                     <button
@@ -363,9 +354,9 @@ function CardsPage() {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                        strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                         ></path>
                       </svg>
@@ -416,8 +407,8 @@ function CardsPage() {
                     >
                       <path
                         strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       ></path>
                     </svg>
@@ -427,9 +418,9 @@ function CardsPage() {
               )}
             </div>
           ))}
+          <Outlet />
         </main>
       </div>
-      <Outlet />
     </div>
   );
 }

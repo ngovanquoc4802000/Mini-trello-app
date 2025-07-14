@@ -6,7 +6,7 @@ const queriesCards = {
         queryKey: ["cards", boardId],
         queryFn: async() => {
           const result = await getAllCards(boardId);
-          if(result && result) return result;
+          if(result) return result;
           return null
         },
         staleTime: 1000 * 60 * 60
