@@ -56,7 +56,6 @@ export const useCreateBoards = ({ onClose }: CreateBoardProps) => {
               ...newBoard,
             };
           } else {
-            // Board chưa có → thêm mới (create)
             updatedBoards = [newBoard, ...previousBoards];
           }
 

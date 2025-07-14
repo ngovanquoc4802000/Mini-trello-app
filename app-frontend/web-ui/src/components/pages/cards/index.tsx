@@ -7,10 +7,10 @@ import type { CreateCards } from "../../mockup/cards";
 import queriesCards from "../../queries/cards";
 import CreateBoard from "../boards/createBoard";
 import InvitesMember from "../invites";
-import CreateTasks from "../tasks/createTaks";
+import TasksPage from "../tasks";
+import CreateTasksPages from "../tasks/createTasks";
 import TaskDetails from "../tasks/taskDetail";
 import "./styles.scss";
-import TasksPage from "../tasks";
 
 function CardsPage() {
   const [showDetail, setShowDetail] = useState<boolean>(false);
@@ -39,12 +39,6 @@ function CardsPage() {
   });
 
   const findName = cartList?.board.name;
-
-  const handleTaskDetail = (cardId: string) => {
-    if (boardId && cardId) {
-      setShowDetail(true);
-    }
-  };
 
   const handleInvite = () => {
     setShowInvite(true);
@@ -141,13 +135,13 @@ function CardsPage() {
 
       <div className=" border bg-gray-900 py-3 px-4 flex items-center justify-between border-b border-gray-700 header-mobile-sticky">
         {" "}
-        <h2 className="text-md font-semibold truncate mr-4">
-          Challenge 5days
-          {/* tên board */}
+        <h2 className="text-[20px] font-semibold truncate mr-4">
+          {findName}
         </h2>{" "}
+        <div className="flex">
         <button
           onClick={() => setShowAddNewBoard(true)}
-          className="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 flex items-center text-sm font-semibold"
+          className="bg-gray-700  mr-3 text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
         >
           <svg
             className="h-4 w-4 mr-1"
@@ -165,6 +159,28 @@ function CardsPage() {
           </svg>
           New
         </button>
+        <button
+          onClick={handleInvite}
+          className="bg-gray-700  text-white hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
+        >
+          <svg
+            className="h-4 w-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+          Invite member
+        </button>
+
+        </div>
         {showAddNewBoard && (
           <CreateBoard onClose={() => setShowAddNewBoard(false)} />
         )}
@@ -273,31 +289,7 @@ function CardsPage() {
         </aside>
 
         <main className="flex-1 p-6 md:p-8 bg-gray-800 overflow-x-auto kanban-scrollable">
-          <div className="bg-purple-700 p-4 rounded-lg shadow-lg flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">{findName}</h2>
 
-            <button
-              onClick={handleInvite}
-              className="bg-white  text-black hover:bg-gray-800 hover:text-white px-4 py-2 cursor-pointer rounded-lg  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50 flex items-center text-sm"
-            >
-              <svg
-                className="h-4 w-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                ></path>
-              </svg>
-              Invite member
-            </button>
-          </div>
-          
           {showInvite && <InvitesMember onClose={() => setShowInvite(false)} />}
 
           {cartList.cards.map((item, index) => (
@@ -324,22 +316,21 @@ function CardsPage() {
                 </div>
 
                 {/* detail nhé */}
-                {item.id  && (
-                  <TasksPage
-                    boardId={boardId ?? ""}
-                    cardId={item.id}
-                    handleTaskDetail={() => handleTaskDetail(item.id)}
-                  />
+                {item.id && (
+                  <TasksPage boardId={boardId ?? ""} cardId={item.id} />
                 )}
 
                 {showDetail && (
                   <>
-                    <TaskDetails onClose={() => setShowDetail(false)} />
+                    <TaskDetails  setShowDetail={setShowDetail} />
                   </>
                 )}
 
                 {showAddCard ? (
-                  <CreateTasks setShowAddCard={setShowAddCard} />
+                  <CreateTasksPages
+                    item={item.id}
+                    setShowAddCard={setShowAddCard}
+                  />
                 ) : (
                   <>
                     <button
