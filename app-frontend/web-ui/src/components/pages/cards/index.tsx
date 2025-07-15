@@ -1,82 +1,42 @@
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
-import type { CreateCards } from "../../mockup/cards";
-import queriesCards from "../../queries/cards";
-import { createCards } from "../../service/cards";
+import { Link, Outlet } from "react-router-dom";
 import CreateBoard from "../boards/createBoard";
 import InvitesMember from "../invites";
 import TasksPage from "../tasks";
 import CreateTasksPages from "../tasks/createTasks";
 import TaskDetails from "../tasks/taskDetail";
 import "./styles.scss";
+import { useCardsPage } from "../../hooks/cards/useCardsPage";
 
 function CardsPage() {
-  const [showDetail, setShowDetail] = useState<boolean>(false);
-
-  const [showInvite, setShowInvite] = useState<boolean>(false);
-
-  const [showAddListInput, setShowAddListInput] = useState<boolean>(false);
-
-  const [showAddCard, setShowAddCard] = useState<string | null>(null);
-
-  const [showAddNewBoard, setShowAddNewBoard] = useState<boolean>(false);
-
-  const [cards, setCards] = useState<CreateCards>({
-    name: "",
-    description: "",
-  });
-
-  const { boardId } = useParams();
-
   const {
     isLoading,
+    cartList,
     isError,
-    data: cartList,
-  } = useQuery({
-    ...queriesCards.list(boardId ?? ""),
-  });
-
-  const findName = cartList?.board.name;
-
-  const handleInvite = () => {
-    setShowInvite(true);
-  };
-  const handleChangeCardsInput = (e: {
-    target: { name: string; value: string };
-  }) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    setCards((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  const queryClient = useQueryClient();
-  const handleAddCards = () => {
-    updateCards();
-    setShowAddListInput(false);
-  };
-  const { mutate: updateCards } = useMutation({
-    mutationFn: async () => {
-      const response = await createCards(boardId ?? "",cards);
-      if (!response) {
-        throw new Error("Failed to create board");
-      }
-      return response;
-    },
-   onSuccess: () => {
-    // Đảm bảo queryKey giống hệt với useQuery
-    queryClient.invalidateQueries({...queriesCards.list});
-
-  setCards({ name: "", description: "" });
-  setShowAddListInput(false);
-  },
-});
-
-
+    valueName,
+    setEditName,
+    setShowAddCard,
+    setShowAddNewBoard,
+    showDetail,
+    showInvite,
+    boardId,
+    setShowInvite,
+    setShowDetail,
+    showAddCard,
+    handleAddCards,
+    handleChangeCardsInput,
+    setShowAddListInput,
+    showAddListInput,
+    cards,
+    handleInvite,
+    showAddNewBoard,
+    editName,
+    updateBoardName,
+    handleFindName,
+    nameInputRef,
+    findName,
+  } = useCardsPage();
   if (isLoading || !cartList) return <div>...Loading</div>;
 
   if (isError) return <div>...Error</div>;
@@ -159,9 +119,29 @@ function CardsPage() {
 
       <div className=" border bg-gray-900 py-3 px-4 flex items-center justify-between border-b border-gray-700 header-mobile-sticky">
         {" "}
-        <h2 className="text-[20px] font-semibold truncate mr-4">
-          {findName}
-        </h2>{" "}
+        {valueName ? (
+          <input
+            ref={nameInputRef}
+            type="text"
+            className="w-[200px] bg-white outline text-black px-2 py-1 rounded"
+            name="name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                updateBoardName(editName);
+              }
+            }}
+            autoFocus
+          />
+        ) : (
+          <h2
+            onClick={handleFindName}
+            className="text-[20px] font-semibold truncate mr-4 cursor-pointer hover:text-gray-300 transition-colors"
+          >
+            {findName}
+          </h2>
+        )}
         <div className="flex">
           <button
             onClick={() => setShowAddNewBoard(true)}
@@ -287,17 +267,6 @@ function CardsPage() {
                   User 1
                 </a>
               </li>
-              <li className="mb-2">
-                <a
-                  href="#"
-                  className="flex items-center p-2 rounded-lg text-gray-300 hover:bg-gray-700"
-                >
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-3">
-                    SD
-                  </div>
-                  User 2
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -322,6 +291,7 @@ function CardsPage() {
               >
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-semibold text-lg">{item.name}</h3>
+
                   <button className="text-gray-400 hover:text-gray-200">
                     <svg
                       className="h-5 w-5"
@@ -403,7 +373,7 @@ function CardsPage() {
             ) : (
               <button
                 onClick={() => setShowAddListInput(true)}
-                className="bg-gray-700 bg-opacity-50 cursor-pointer hover:bg-gray-500  text-gray-300 p-4 w-64 rounded-lg flex-shrink-0 flex items-baseline justify-baseline" 
+                className="bg-gray-700 bg-opacity-50 cursor-pointer hover:bg-gray-500  text-gray-300 p-4 w-64 rounded-lg flex-shrink-0 flex items-baseline justify-baseline"
               >
                 <svg
                   className="h-5 w-5 mr-2"

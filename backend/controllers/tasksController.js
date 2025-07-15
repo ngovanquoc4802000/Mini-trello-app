@@ -192,6 +192,7 @@ const deleteTaskById = async (req, res) => {
 const assignTask = async (req, res) => {
   try {
     const { boardId, id: cardId, taskId } = req.params;
+
     const { memberId } = req.body;
 
     if (!boardId || !cardId || !taskId || !memberId) {
@@ -202,6 +203,7 @@ const assignTask = async (req, res) => {
     }
 
     const taskRef = firebaseStoreDB.collection("tasks").doc(taskId);
+    
     const taskSnapshot = await taskRef.get();
 
     if (!taskSnapshot.exists) {

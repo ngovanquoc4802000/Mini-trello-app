@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import queriesTasks from "../../queries/tasks";
+import { useTasksPage } from "../../hooks/tasks/useTasksPage";
 
 interface TasksPageTs {
   boardId: string;
@@ -9,20 +7,12 @@ interface TasksPageTs {
 }
 
 function TasksPage({ boardId, cardId }: TasksPageTs) {
-  const {
-    isLoading: loadingTasks,
-    isError: errorTasks,
-    data,
-  } = useQuery({ ...queriesTasks.list(boardId, cardId) });
-
-  const navigate = useNavigate();
-
-  const handleTaskDetail = (cardId: string, taskId: string) => {
-    if (boardId && cardId && taskId) {
-      navigate(`${cardId}/tasks/${taskId}`);
-    }
-  };
-  const taskList = data?.tasks ?? [];
+   const {
+       loadingTasks,errorTasks,
+        taskList,
+        handleEditTasks,
+        handleTaskDetail
+   } = useTasksPage({boardId,cardId})
 
   if (loadingTasks) return <div>...Loading</div>;
 
@@ -37,7 +27,9 @@ function TasksPage({ boardId, cardId }: TasksPageTs) {
           className="bg-gray-800 p-3 cursor-pointer rounded-lg shadow-md mb-3"
         >
           <div className="flex justify-between items-center mt-2">
-            <p className="text-sm">{item.title}</p>
+            <p 
+            onClick={handleEditTasks}
+            className="text-sm">{item.title}</p>
             <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs mr-2">
               SD
             </div>

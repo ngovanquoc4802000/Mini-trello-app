@@ -1,4 +1,4 @@
-import type { Board, BoardAll, CreateBoardTs } from "../mockup/boards";
+import type { UpdateBoardTs, Board, BoardAll, CreateBoardTs } from "../mockup/boards";
 import { Request } from "../utils/https";
 
 export const getAllBoards = async () => {
@@ -10,6 +10,16 @@ export const getAllBoards = async () => {
     throw error;
   }
 };
+
+export const updateBoards = async(boardId: string,payload: CreateBoardTs) => {
+    try {
+        const response = await Request.put<UpdateBoardTs>(`/${boardId}`,payload);
+        return response.data;
+    } catch(error) {
+      console.log("Error update Board Id ", error);
+      throw Error;
+    }
+} 
 
 export const createBoards = async(payload: CreateBoardTs) => {
   try {
