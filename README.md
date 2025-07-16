@@ -35,7 +35,6 @@ A Trello-style task management application with core features:
      - Step 4: Start the backend server:
      + cd backend > npm run serve
 ## Frontend:
-
      - Step 1: Setting and run frontend (Vite + React + Typescript)
        + cd app-frontend
        + npm install
@@ -60,6 +59,18 @@ routers/: define RESTful API routes like /boards, /cards, /tasks, etc.
 ✅ Tailwind CSS is used for styling (you can switch to CSS Modules if preferred)
 
 ✅ State is managed using React state and react-query
+
+## Implemented Features:
+ 
+ ## Frontend: 
+   ✅ Responsive design for boards, cards, and tasks, ensuring a great user experience across various screen sizes.
+   ✅Complete UI for login and authentication pages.
+   ✅Board management: Create, edit, and view individual board details.
+   ✅Card management: Display lists of cards and create new cards.
+   ✅Task details: View individual task details, add descriptions, and leave comments.
+  ## Backend: 
+   ✅ Full CRUD (Create, Read, Update, Delete) functionality for boards, cards, and tasks.
+  * Note: GitHub OAuth and invite functionalities are planned for future development.
 
 ## Do not commit the .env file or any .json files containing sensitive information to GitHub.
 

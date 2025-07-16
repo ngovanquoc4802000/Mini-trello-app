@@ -1,64 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import type { CreateTasks, TasksAll } from "../../../mockup/tasks";
-import { createTasks } from "../../../service/tasks";
+import { useCreateTaskPages } from "../../../hooks/tasks/useCreateTaskPages";
 interface TasksPagesProps {
   setShowAddCard?: React.Dispatch<React.SetStateAction<boolean>>;
   item: string;
 }
 function CreateTasksPages({ setShowAddCard, item }: TasksPagesProps) {
-  const [tasks, setTasks] = useState<CreateTasks>({
-    title: "",
-    description: "No description",
-    status: "đang thực hiện",
-  });
-  const queryClient = useQueryClient();
+  const {
+    tasks,
+    handleAddTask,
+    handleChangeTasksInput
+  } = useCreateTaskPages({ setShowAddCard, item });
 
-  const handleChangeTasksInput = (e: {
-    target: { name: string; value: string };
-  }) => {
-    const { name, value } = e.target;
-    console.log(name, value);
-    setTasks((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const { boardId } = useParams();
-  const handleAddTask = async () => {
-    updateTasks();
-  };
-
-  const { mutate: updateTasks } = useMutation({
-    mutationFn: async () => {
-      const response = await createTasks(boardId ?? "", item, tasks);
-       console.log("Server response:", response);
-      return response;
-    },
-    onSuccess: async () => {
-      await queryClient.cancelQueries({ queryKey: ["tasks", boardId, item] });
-      const previousTasks = queryClient.getQueryData(["tasks", boardId, item]);
-      queryClient.setQueryData(["tasks", boardId, item], (old: TasksAll | undefined) => {
-        return { 
-          success: true,
-          tasks: [...(old?.tasks ?? []), tasks],
-        };
-      });
-      setTasks({
-        title: "",
-        description: "",
-        status: "đang thực hiện",
-      });
-      console.log("Create task new success");
-      return { previousTasks };
-    },
-    onError: (error) => {
-      console.error("Error create tasks new" + error);
-    },
-  });
-  
   return (
     <div className=" bg-gray-800 p-3 rounded-lg shadow-md mb-3">
       <input

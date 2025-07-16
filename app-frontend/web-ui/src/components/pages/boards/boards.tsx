@@ -97,7 +97,7 @@ function BoardsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {boardList.boards.map((item, index) => (
               <Link key={index} to={`/boards/${item.id}/cards`}>
-                <div className="bg-gray-700 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col justify-between">
+                <div className="bg-gray-700 p-6 rounded-lg h-[130px] shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer flex flex-col justify-between">
                   <h3 className="text-xl font-semibold mb-8 text-white">
                     {item.name}
                   </h3>
