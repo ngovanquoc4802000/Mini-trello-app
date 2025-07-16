@@ -25,6 +25,7 @@ function CreateTasksPages({ setShowAddCard, item }: TasksPagesProps) {
       [name]: value,
     }));
   };
+
   const { boardId } = useParams();
   const handleAddTask = async () => {
     updateTasks();
@@ -57,6 +58,7 @@ function CreateTasksPages({ setShowAddCard, item }: TasksPagesProps) {
       console.error("Error create tasks new" + error);
     },
   });
+  
   return (
     <div className=" bg-gray-800 p-3 rounded-lg shadow-md mb-3">
       <input
