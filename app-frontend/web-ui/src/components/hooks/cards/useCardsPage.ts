@@ -8,7 +8,7 @@ import { updateBoards } from "../../service/boards";
 import { createCards } from "../../service/cards";
 
 export const useCardsPage = () => {
-     const [showDetail, setShowDetail] = useState<boolean>(false);
+  const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const [showInvite, setShowInvite] = useState<boolean>(false);
 
@@ -34,13 +34,14 @@ export const useCardsPage = () => {
   } = useQuery({
     ...queriesCards.list(boardId ?? ""),
   });
-
   const findName = cartList?.board.name;
-  const [editName, setEditName] = useState(findName ?? "");
+
+  const [editNameBoard, setEditNameBoard] = useState(findName ?? "");
+
 
   useEffect(() => {
     if (cartList?.board?.name) {
-      setEditName(cartList.board.name);
+      setEditNameBoard(cartList.board.name);
     }
   }, [cartList]);
   const handleInvite = () => {
@@ -64,8 +65,8 @@ export const useCardsPage = () => {
         nameInputRef.current &&
         !nameInputRef.current.contains(event.target as Node)
       ) {
-        if (editName !== cartList?.board.name) {
-          updateBoardName(editName);
+        if (editNameBoard !== cartList?.board.name) {
+          updateBoardName(editNameBoard);
         }
         setValueName(false);
       }
@@ -75,7 +76,7 @@ export const useCardsPage = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [editName, cartList]);
+  }, [editNameBoard, cartList]);
   const queryClient = useQueryClient();
 
   const handleAddCards = () => {
@@ -105,7 +106,9 @@ export const useCardsPage = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ ...queriesBoards.list });
-      queryClient.invalidateQueries({ ...queriesCards.list(boardId ?? "").queryFn }); 
+      queryClient.invalidateQueries({
+        ...queriesCards.list(boardId ?? "").queryFn,
+      });
       setValueName(false);
     },
     onError: (error) => {
@@ -127,7 +130,7 @@ export const useCardsPage = () => {
     showAddNewBoard,
     showAddListInput,
     setCards,
-    setEditName,
+    setEditNameBoard,
     setShowAddCard,
     setShowAddNewBoard,
     setShowDetail,
@@ -139,9 +142,9 @@ export const useCardsPage = () => {
     cartList,
     boardId,
     cards,
-    editName,
+    editNameBoard,
     updateBoardName,
     nameInputRef,
-    findName
-  }
-}
+    findName,
+  };
+};

@@ -10,6 +10,12 @@ export interface AddBoard {
   name: string
   description: string
 }
+export interface ResponseCards {
+  message:string;
+  description: string;
+  id:string;
+  name:string;
+}
 
 export interface CreateCards {
   name: string;

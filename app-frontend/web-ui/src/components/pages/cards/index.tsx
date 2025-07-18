@@ -1,13 +1,17 @@
 import logoNotification from "$/assets/logo-notifice.png";
 import logo from "$/assets/logo.png";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { useCardsPage } from "../../hooks/cards/useCardsPage";
+import queriesCards from "../../queries/cards";
+import { updateCards } from "../../service/cards";
 import CreateBoard from "../boards/createBoard";
 import InvitesMember from "../invites";
 import TasksPage from "../tasks";
 import CreateTasksPages from "../tasks/createTasks";
 import TaskDetails from "../tasks/taskDetail";
 import "./styles.scss";
-import { useCardsPage } from "../../hooks/cards/useCardsPage";
 
 function CardsPage() {
   const {
@@ -15,7 +19,7 @@ function CardsPage() {
     cartList,
     isError,
     valueName,
-    setEditName,
+    setEditNameBoard,
     setShowAddCard,
     setShowAddNewBoard,
     showDetail,
@@ -31,12 +35,94 @@ function CardsPage() {
     cards,
     handleInvite,
     showAddNewBoard,
-    editName,
+    editNameBoard,
     updateBoardName,
     handleFindName,
     nameInputRef,
     findName,
   } = useCardsPage();
+
+  const [valueNameCard, setValueNameCard] = useState<
+    Record<string, { name: string; description: string }>
+  >({});
+
+  const [editCardId, setEditCardId] = useState<string | null>(null);
+
+  const handleEditCardsName = (
+    cardId: string,
+    currentCard: { name: string; description: string }
+  ) => {
+    setEditCardId(cardId);
+    setValueNameCard((prev) => ({
+      ...prev,
+      [cardId]: {
+        name: currentCard.name,
+        description: currentCard.description || "",
+      },
+    }));
+  };
+  const handleChangeCardValue = (
+    cardId: string,
+    field: "name" | "description",
+    value: string
+  ) => {
+    setValueNameCard((prev) => ({
+      ...prev,
+      [cardId]: {
+        ...prev[cardId],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleBlur = () => {
+    setEditCardId(null);
+    if (editCardId && valueNameCard[editCardId]) {
+      updateCardsNameLogic({ cardId: editCardId });
+    }
+  };
+
+  const queryClient = useQueryClient();
+
+  const { mutate: updateCardsNameLogic } = useMutation({
+    mutationFn: async ({ cardId }: { cardId: string }) => {
+      const cardToUpdate = valueNameCard[cardId];
+      return await updateCards(boardId ?? "", cardId, {
+        name: cardToUpdate?.name ?? "",
+        description: cardToUpdate?.description ?? "",
+      });
+    },
+    onSuccess: () => {
+      queryClient.getQueryData(["cards"]);
+      queryClient.invalidateQueries({ ...queriesCards.list });
+      console.log("đã cập nhật thành công rồi nhé !");
+    },
+    onError: () => {
+      alert("Edit failed");
+    },
+  });
+  const [showRound, setShowRound] = useState<string | null>(null);
+
+  const operationRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const handleClickOutSide = (e: MouseEvent) => {
+      if (
+        operationRef.current &&
+        !operationRef.current.contains(e.target as Node)
+      ) {
+        setShowRound(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutSide);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutSide);
+    };
+  }, []);
+
+  const showThreeRound = (id: string) => {
+    setShowRound(id);
+  };
+
   if (isLoading || !cartList) return <div>...Loading</div>;
 
   if (isError) return <div>...Error</div>;
@@ -125,11 +211,11 @@ function CardsPage() {
             type="text"
             className="w-[200px] bg-white outline text-black px-2 py-1 rounded"
             name="name"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
+            value={editNameBoard}
+            onChange={(e) => setEditNameBoard(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                updateBoardName(editName);
+                updateBoardName(editNameBoard);
               }
             }}
             autoFocus
@@ -290,23 +376,85 @@ function CardsPage() {
                 className="kanban-list bg-gray-700 w-64 flex-shrink-0 rounded-lg p-4"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-lg">{item.name}</h3>
-
-                  <button className="text-gray-400 hover:text-gray-200">
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {editCardId === item.id ? (
+                    <input
+                      type="text"
+                      value={valueNameCard[item.id]?.name || ""}
+                      onChange={(e) =>
+                        handleChangeCardValue(item.id, "name", e.target.value)
+                      }
+                      onBlur={handleBlur}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleBlur();
+                      }}
+                      className="outline border-none p-1 bg-white text-black b"
+                    />
+                  ) : (
+                    <h3
+                      onClick={() => handleEditCardsName(item.id, item)}
+                      className="font-semibold text-lg"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                      />
-                    </svg>
-                  </button>
+                      {item.name}
+                    </h3>
+                  )}
+
+                  {showRound === item.id ? (
+                    <div
+                      ref={operationRef}
+                      className="fixed z-[1000] bg-white top-[190px]  text-black rounded-lg shadow-lg w-64 sm:w-72 md:w-65 p-4"
+                   >
+                      <div className="flex justify-between items-center border-b pb-2 mb-2">
+                        <h6 className="text-lg font-semibold text-gray-700">
+                          Operation
+                        </h6>
+                        <button
+                          onClick={() => setShowRound(null)}
+                          className="text-gray-500 hover:text-red-500 rounded-full border p-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-800">
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Add card
+                        </li>
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Copy list
+                        </li>
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Move list
+                        </li>
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Move all cards in this list
+                        </li>
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Sort by…
+                        </li>
+                        <li className="hover:bg-gray-100 px-2 py-1 rounded cursor-pointer">
+                          Monitor
+                        </li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => showThreeRound(item.id)}
+                      className="text-gray-400 hover:text-gray-200"
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 {item.id && (
