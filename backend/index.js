@@ -22,7 +22,7 @@ app.use(cors());
 app.use("/boards",routerBoard)
 app.use("/boards/:boardsId/cards", routerCards);
 app.use("/boards/", routerInvite);
-app.use("/auth",routerUsers);
+app.use("/boards/auth",routerUsers);
 app.use("/boards/:boardId/cards/:id/tasks", routerTasks);
 
 app.get("/", (req, res) => {-

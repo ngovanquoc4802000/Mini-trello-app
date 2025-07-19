@@ -38,12 +38,12 @@ export const useCardsPage = () => {
 
   const [editNameBoard, setEditNameBoard] = useState(findName ?? "");
 
-
   useEffect(() => {
-    if (cartList?.board?.name) {
-      setEditNameBoard(cartList.board.name);
-    }
-  }, [cartList]);
+  if (cartList?.board?.name && editNameBoard === "") {
+    setEditNameBoard(cartList.board.name);
+  }
+}, [cartList, editNameBoard]);
+
   const handleInvite = () => {
     setShowInvite(true);
   };
@@ -105,11 +105,9 @@ export const useCardsPage = () => {
         description: cartList?.board.description ?? "",
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ ...queriesBoards.list });
-      queryClient.invalidateQueries({
-        ...queriesCards.list(boardId ?? "").queryFn,
-      });
-      setValueName(false);
+     queryClient.invalidateQueries({ queryKey: queriesBoards.list().queryKey }); // ✅ fix
+    queryClient.invalidateQueries({ queryKey: queriesCards.list(boardId ?? "").queryKey }); // ✅ cũng đúng
+  setValueName(false);
     },
     onError: (error) => {
       console.error("Failed to update board name:", error);
