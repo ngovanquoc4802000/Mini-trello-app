@@ -7,7 +7,7 @@ import routerBoard from "./routers/routerBoard.js"
 import routerCards from "./routers/routerCards.js";
 import routerInvite from "./routers/routerInvite.js";
 import routerTasks from "./routers/routerTasks.js";
-
+import routerUsers from "./routers/routerUser.js"
 import { firebaseStoreDB,auth, storage,realtimeDB,adminSdk} from "./firebaseAdmin.js";
 
 const app = express();
@@ -22,6 +22,7 @@ app.use(cors());
 app.use("/boards",routerBoard)
 app.use("/boards/:boardsId/cards", routerCards);
 app.use("/boards/", routerInvite);
+app.use("/auth",routerUsers);
 app.use("/boards/:boardId/cards/:id/tasks", routerTasks);
 
 app.get("/", (req, res) => {-

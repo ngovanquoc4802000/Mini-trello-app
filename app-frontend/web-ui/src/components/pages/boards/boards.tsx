@@ -86,6 +86,19 @@ function BoardsPage() {
                   All Members
                 </a>
               </li>
+               <li>
+                <a
+                  href="#"
+                  className="flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700"
+                >
+                  <img
+                    src={logoMember}
+                    className="h-5 w-5 mr-3"
+                    alt="Members"
+                  />
+                  Management Users
+                </a>
+              </li>
             </ul>
           </nav>
         </aside>

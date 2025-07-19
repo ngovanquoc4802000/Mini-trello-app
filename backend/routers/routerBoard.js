@@ -1,12 +1,13 @@
 import express from "express";
 import BoardController from "../controllers/boardController.js";
+import verifyToken from "../middleWare/verifyToken.js";
 
 const router = express.Router();
 
-router.get("/",BoardController.getAllBoard);
-router.get("/:id",BoardController.getIdBoard);
-router.post("/", BoardController.createBoard);
-router.put("/:id",BoardController.updateBoard)
-router.delete("/:id",BoardController.deleteBoard)
+router.get("/", BoardController.getAllBoard);
+router.get("/:id", verifyToken, BoardController.getIdBoard);
+router.post("/", verifyToken, BoardController.createBoard);
+router.put("/:id", verifyToken, BoardController.updateBoard);
+router.delete("/:id", verifyToken, BoardController.deleteBoard);
 
 export default router;
