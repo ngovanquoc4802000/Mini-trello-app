@@ -1,11 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
+import VerifyPage from "../components/auth/verifyPages";
+import NotFound from "../components/notfound";
 import BoardsPage from "../components/pages/boards/boards";
 import CardsPage from "../components/pages/cards";
 import TasksPage from "../components/pages/tasks";
 import TaskDetails from "../components/pages/tasks/taskDetail";
 
 export const routerStore = createBrowserRouter([
-  { path: "/boards", index: true, element: <BoardsPage /> },
+  { path: "/boards", element: <BoardsPage /> },
   {
     path: "/boards/:boardId/cards",
     element: <CardsPage />,
@@ -20,4 +22,12 @@ export const routerStore = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "auth/login",
+    element: <VerifyPage/>
+  },
+  {
+    path: "*",
+    element:<NotFound/>
+  }
 ]);

@@ -1,3 +1,6 @@
+import LoginPage from "../../components/auth/loginPages";
+import RegisterPages from "../../components/auth/registerPages";
+import NotFound from "../../components/notfound";
 import BoardsPage from "../../components/pages/boards/boards";
 import CardsPage from "../../components/pages/cards";
 import TasksPage from "../../components/pages/tasks";
@@ -6,7 +9,6 @@ import TaskDetails from "../../components/pages/tasks/taskDetail";
 export const routerStore = [
   {
     path: "/boards",
-    index: true,
     element: <BoardsPage />,
   },
   {
@@ -23,4 +25,18 @@ export const routerStore = [
       },
     ],
   },
+  {
+    path: "auth/login",
+    index: true,
+    element: <LoginPage/>
+  },
+   {
+    path: "auth/register",
+    index: true,
+    element: <RegisterPages/>
+  },
+  {
+    path: "*",
+    element:<NotFound/>
+  }
 ];

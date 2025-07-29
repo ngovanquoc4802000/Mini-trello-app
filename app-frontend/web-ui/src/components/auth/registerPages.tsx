@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
-function LoginPage() {
-  return (
-    <div className="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+function RegisterPages() {
+    return ( 
+         <div className="bg-gray-100 flex items-center justify-center min-h-screen p-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-lg">
         <div className="flex justify-center mb-6">
           <svg
@@ -42,7 +42,7 @@ function LoginPage() {
         </div>
 
         <h2 className="text-center text-lg font-semibold text-gray-700 mb-6">
-          Log in to continue
+          Register to continue
         </h2>
 
         <div className="mb-4">
@@ -56,6 +56,20 @@ function LoginPage() {
             type="email"
             id="email"
             placeholder="Enter your email"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+          />
+        </div>
+          <div className="mb-4">
+          <label
+            htmlFor="password"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Password<span className="text-red-500">*</span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
           />
         </div>
@@ -94,7 +108,7 @@ function LoginPage() {
         </div>
 
         <button className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-6">
-          Login
+          Register
         </button>
 
         <p className="text-center font-bold text-gray-500 text-sm mb-6">
@@ -146,7 +160,7 @@ function LoginPage() {
             Can't log in?
           </a>
           <span className="mx-2 text-gray-400">•</span>
-          <Link to="/auth/register" className="text-blue-600 hover-underline">
+          <Link to="/auth/login" className="text-blue-600 hover-underline">
             Create an account
           </Link>
         </div>
@@ -183,7 +197,7 @@ function LoginPage() {
         </div>
       </div>
     </div>
-  );
+     );
 }
 
-export default LoginPage;
+export default RegisterPages;
