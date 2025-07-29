@@ -8,6 +8,7 @@ const getAllBoard = async (req, res) => {
     boardsFiled.forEach((doc) => {
       boardsArr.push({ id: doc.id, ...doc.data() });
     });
+
     res.status(200).json({
       success: true,
       description:
@@ -64,6 +65,9 @@ const getIdBoard = async (req, res) => {
 
 const createBoard = async (req, res) => {
   const { name, description } = req.body;
+  
+  const userId = req.user ? req.user.uid : null;
+
   try {
     if (!name) {
       return res.status(400).json({
@@ -74,19 +78,32 @@ const createBoard = async (req, res) => {
     const newBoardData = {
       name: name,
       description: description || "",
-      members: [],
+      ownerId: userId,
+      members: [userId],
       createdAt: adminSdk.firestore.FieldValue.serverTimestamp(),
     };
     console.log(newBoardData);
+
     const boardField = await firebaseStoreDB
       .collection("boards")
       .add(newBoardData);
+    const createBoardNew = { id: boardField.id, ...newBoardData };
+    
+    const io = req.app.get("socketio");
 
+    if (io) {
+      io.emit("boardCreated", {
+        board: createBoardNew,
+        message: `new board ${name}created `,
+      });
+      console.log("Đã phát sự kiện được nhé !");
+    } else {
+      console.warn("Socket.IO instance not available in createBoard.");
+    }
     return res.status(200).json({
       success: true,
       description: "Creates a new board",
-      id: boardField.id,
-      ...newBoardData,
+      createBoardNew,
     });
   } catch (error) {
     console.log("Error create board new", error);
@@ -156,11 +173,11 @@ const deleteBoard = async (req, res) => {
       });
     }
     return res.status(200).send({
-        success: true,
-        description:"Deletes a specific board.",
-        message: " No content in response body. Board successfully deleted.",
-        board: boardDoc
-    })
+      success: true,
+      description: "Deletes a specific board.",
+      message: " No content in response body. Board successfully deleted.",
+      board: boardDoc,
+    });
   } catch (error) {
     console.log("Error remove id board");
   }
@@ -171,5 +188,5 @@ export default {
   createBoard,
   getIdBoard,
   updateBoard,
-  deleteBoard
+  deleteBoard,
 };

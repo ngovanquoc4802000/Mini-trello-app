@@ -7,7 +7,7 @@ const verifyToken = async (req,res,next) => {
     if (!token) return res.status(401).json({ message: "No token provided" });
   try {
     const decoded = await auth.verifyIdToken(token,JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; //chứa uid , email, name
     next();
   } catch (error) {
     return res.status(403).json({ message: "Unauthorized" });

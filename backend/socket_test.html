@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <title>Socket.IO Test Client</title>
+</head>
+<body>
+     <h1>Socket.IO Test Client for Trello-mini-app</h1>
+    <p>Kết nối tới server để xem các sự kiện Board được tạo.</p>
+     <button id="connectBtn">Connect to Socket.IO</button>
+    <button id="disconnectBtn" disabled>Disconnect</button>
+    <p>Trạng thái kết nối: <span id="status">Disconnected</span></p>
+     <h2>Messages from Server:</h2>
+    <div id="messages"></div>
+
+    <script>
+        let socket;
+        const statusSpan = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+
+        function appendMessage(msg) {
+            const p = document.createElement('div');
+            p.className = 'message-item';
+            p.textContent = msg;
+            messagesDiv.appendChild(p);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Cuộn xuống cuối
+        }
+
+        connectBtn.onclick = () => {
+            if (socket && socket.connected) {
+                appendMessage("Already connected.");
+                return;
+            }
+            // Thay đổi URL nếu server của bạn chạy ở nơi khác
+            socket = io('http://localhost:3001'); // Kết nối đến server Socket.IO của bạn
+
+            socket.on('connect', () => {
+                statusSpan.textContent = 'Connected';
+                statusSpan.style.color = 'green';
+                appendMessage('Socket.IO: Connected to server!');
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            });
+
+            socket.on('disconnect', () => {
+                statusSpan.textContent = 'Disconnected';
+                statusSpan.style.color = 'red';
+                appendMessage('Socket.IO: Disconnected from server!');
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            });
+
+            socket.on('connect_error', (error) => {
+                statusSpan.textContent = 'Connection Error';
+                statusSpan.style.color = 'orange';
+                appendMessage(`Socket.IO: Connection Error: ${error.message}`);
+                console.error('Socket.IO Connection Error:', error);
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            });
+
+            // Lắng nghe sự kiện 'boardCreated' từ server
+            socket.on('boardCreated', (data) => {
+                appendMessage(`[BOARD CREATED] ID: ${data.board.id}, Name: ${data.board.name}, Message: ${data.message}`);
+                console.log('Received boardCreated:', data);
+            });
+
+            // Bạn có thể thêm các sự kiện khác mà server sẽ emit (ví dụ: boardUpdated, boardDeleted)
+            // socket.on('boardUpdated', (data) => {
+            //     appendMessage(`[BOARD UPDATED] ID: ${data.boardId}, Message: ${data.message}`);
+            // });
+        };
+
+        disconnectBtn.onclick = () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
+
+        // Tự động kết nối khi tải trang
+        connectBtn.click();
+
+    </script>
+</body>
+</html>

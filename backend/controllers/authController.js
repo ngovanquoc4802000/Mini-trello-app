@@ -42,6 +42,7 @@ const register = async (req, res) => {
       .json({ message: "Registration failed", error: err.message });
   }
 };
+
 const getAllUser = async(req,res) => {
   try {
     const userAll = await firebaseStoreDB.collection("users").get();
@@ -61,7 +62,8 @@ const getAllUser = async(req,res) => {
      console.log("Error get all users" + error);
      throw Error (`Fails get all User ${error}`)
   }
-}
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
