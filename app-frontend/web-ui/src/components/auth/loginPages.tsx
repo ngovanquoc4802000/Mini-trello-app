@@ -10,9 +10,7 @@ function LoginPage() {
     await signInWithPopup(auth, provider).then((result) => {
       const user = result.user;
       console.log("Login user github:" + user);
-       if (user) {
-        navigate("/boards"); 
-      }
+       if (user) navigate("/boards"); 
     });
   };
   useEffect(() => {

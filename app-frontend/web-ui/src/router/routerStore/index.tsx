@@ -1,4 +1,3 @@
-import LoginPage from "../../components/auth/loginPages";
 import Signin from "../../components/auth/signin";
 import Signup from "../../components/auth/signup";
 import NotFound from "../../components/notfound";
@@ -28,17 +27,12 @@ export const routerStore = [
   },
   {
     path: "auth/signup",
-    index: true,
-    element: <Signup/>
+    element: <Signup/>,
   },
-   {
-    path: "auth/signin",
-    index: true,
-    element: <Signin/>
-  },
+   
   {
-    path:"auth/login",
-    element: <LoginPage/>
+    path:"auth/signin",
+    element: <Signin/>
   },
   {
     path: "*",

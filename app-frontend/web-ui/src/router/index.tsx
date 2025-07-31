@@ -25,11 +25,13 @@ export const routerStore = createBrowserRouter([
   },
   {
     path: "auth/signup",
-    element: <Signup/>
-  },
-  {
-    path: "auth/signin",
-    element: <Signin/>
+    element: <Signup/>,
+    children: [
+      {
+        path: ":signup/signup",
+        element: <Signin/>
+      }
+    ]
   },
   {
     path: "*",
