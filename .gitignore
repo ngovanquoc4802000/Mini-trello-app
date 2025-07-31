@@ -1,12 +1,5 @@
-# Node modules
 node_modules/
-
-# Environment variables
 .env
-
 firestore-data.json
 screenshots
-
-# Service account key (rất quan trọng)
-# Tên file của bạn có thể khác, hãy đảm bảo đường dẫn và tên file chính xác
 backend/config/fir-97d82-cd92a1375a3e.json
